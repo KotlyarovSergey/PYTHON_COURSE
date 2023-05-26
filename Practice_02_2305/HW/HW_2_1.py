@@ -20,3 +20,4 @@ for i in range(n):
     
 min = r if r < a else a
 print(f"Кол-во монет, чтобы перевернуть: {min}")
+
