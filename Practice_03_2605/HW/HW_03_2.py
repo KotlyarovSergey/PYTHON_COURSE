@@ -8,14 +8,17 @@
 #     Input: [10, 5, 7, 3, 3, 2, 5, 7, 3, 8], X = 9
 #     Output: 10
 
-list_1 = [10, 5, 7, 3, 3, 2, 5, 7, 3, 8]
-x = int(input('введите число: '))
+lst = [10, 5, 7, 3, 3, 2, 5, 7, 3, 8]
+x = int(input('введите Х: '))
+# x = 5
 
-nier = list_1[0]
-d_min = list_1[0] - x if list_1[0] - x > 0 else x - list_1[0]
-for n in list_1:
-    d = n - x if n - x > 0 else x - n
-    if d < d_min:
-        nier = n
-
-print(nier)
+if x in lst:
+    print(x)
+else:
+    d_min = abs(lst[0]-x)
+    near = lst[0]
+    for n in lst:
+        if abs(n-x) < d_min:
+            d_min = abs(n-x)
+            near = n
+    print(near, end=" ")

@@ -7,16 +7,25 @@
 #     Output:  [4, 5, 1, 2, 3]
 
 list_1 = []
+list_2 = list()
 n = int(input('количество элементов: '))
 for i in range(n):
     list_1.append(int(input(f'введите {i+1} элемент ')))
+    list_2.append(list_1[-1])
 
 print(f'Ваш список: {list_1}')
+
 k = int(input('число сдвигов: '))
 k = k % n
 
+# 1й способ 
 for i in range(k):
     j = list_1.pop(0)
     list_1.append(j)
 
 print(f'После сдвига: {list_1}')
+
+
+# 2й способ (срезом)
+list_3 = list_2[k:] + list_2[:k]
+print(f'После сдвига: {list_3}')

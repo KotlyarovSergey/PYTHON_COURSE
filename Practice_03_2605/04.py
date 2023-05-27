@@ -26,6 +26,7 @@ for i in range(1, len(list_1)):
         list_2.append(list_1[i])
 
 print(list_2)
-# list_1 = [i for i in range(1, 101) if i % 2 == 0] # [1, 2, 3,..., 100]
-list_2 = [i for i in list_1]
+
+
+list_2 = [list_1[i] for i in range(1, len(list_1)) if list_1[i] > list_1[i-1]]
 print(list_2)

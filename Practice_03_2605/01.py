@@ -5,8 +5,17 @@
 #     [1, 1, 2, 0, 1, 2, 1, 2]  -> 3
 
 list_1 = [1, 1, 2, 0, -1, 3, 4, 4]
+# list_1 = [1, 1, 2, 0, 1, 2, 1, 2]
+
 plenty_1 = set(list_1)
 print(len(plenty_1))
 
-list_1 = [1, 1, 2, 0, 1, 2, 1, 2]
 print(len(set(list_1)))
+
+list_2 = list()
+for itm in list_1:
+    if itm not in list_2:
+        list_2.append(itm)
+print(len(list_2))
+
+
