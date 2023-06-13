@@ -21,54 +21,21 @@
 # user=["ferstname","secondname","phone","discription"]
 # phone_dir = {1:["ferstname","secondname","phone","discription"],2:["ferstname","secondname","phone","discription"]}
 
-def Input_Users()->list:
-    user=[]
+
+from os.path import join, abspath, dirname, exists
+
+def input_data()->list:
+    user = []
     user.append(input("Input ferst name "))
     user.append(input("Input second name "))
     user.append(input("Input phone "))
     user.append(input("Input discription "))
-    
     return user
-# print(Input_Users())
-# def create( user:list)->dict:
 
-key_count =0
-phone_dir = dict()
-def create( phone_dir_local: dict, idc: int,  user:list)->dict:
+def create(phone_dir_local: dict, idc: int, user:list) -> tuple:
     idc += 1
     phone_dir_local[idc] = user
     return phone_dir_local, idc
-
-user1 = ["second_name1","first_name1","phone1","discription1"]
-user2 = ["second_name2","first_name2","phone2","discription2"]
-
-
-phone_dir, key_count=create(phone_dir,key_count,user1)
-phone_dir, key_count=create(phone_dir,key_count,user2)
-# print(phone_dir)
-
-def menu ():
-    print("Введите 1, если хотите ввести пользователя ")
-    print("Введите 2, если хотите распечатать справочник ")
-    print("Введите 3 для экспорта")
-    print("Введите 4 для поиска")
-    key_count =0
-    phone_dir = dict()
-    while True:
-        num = int(input("Выберите операцию "))
-        if num == 0:
-            break
-        if (num ==1):
-           user = Input_Users()
-           phone_dir, key_count = create(phone_dir,key_count,user)
-        if num == 2:
-            print (phone_dir)
-        if num == 3:
-            file_name = input("Выберите имя файла ")
-            export_phone_dir(phone_dir, file_name)
-        if num == 4:
-            searching = input("Кого ищем? ")
-
 
 def export_phone_dir(phone_dir: dict, file_name: str):
     MAIN_DIR = abspath(dirname(__file__))
@@ -77,28 +44,118 @@ def export_phone_dir(phone_dir: dict, file_name: str):
         for idc, user in phone_dir.items():
             file.write(f"{idc}#{user[0]}#{user[1]}#{user[2]}#{user[3]}\n")
 
-
-def search_user(phone_dir: dict, searching: str) -> int:
-    for idc, user in phone_dir.items():
-        if user[0].startswith(searching):
+def search_user(phone_dir_local: dict, searching: str) -> int:
+    for idc, user in phone_dir_local.items():
+        lastname: str = user[0]
+        if lastname.upper().startswith(searching.upper()):
             return idc
+    return 0
 
 def print_dict(phone_dir: dict):
     for idc, user in phone_dir.items():
-        print(f"{idc}: {user[0]} {user[3]} {user[2]} {user[3]}")
+        print(f"{idc}: {user[0]} {user[1]} {user[2]} {user[3]}")
 
-from os.path import join, abspath, dirname
+def print_once(phone_dir: dict, id: int):
+    user = phone_dir[id]
+    print(f"{user[0]} {user[1]} {user[2]} {user[3]}")
 
-phone_dir = {1: ['Иванов',   'Иван',  '+7(xxx)xxx-xx-xx', 'desription_Иванов'], 
-2: ['Петров',   'Петр',  '+7(---)xxx-xx-xx', 'desription_Петров'], 
-3: ['Соколов',  'Илья',  '+7(---)---------', 'desription_Соколов'], 
-4: ['Павельев', 'Андрей','+7(***)***-**-**', 'desription_Павельев'], 
-5: ['Пешехов',  'Антон', '+7++++++++++',     'desription_Пешехов'], 
-6: ['Сааков',   'Илья',  '+7(+++)+++-++-++', 'desription_Сааков'], 
-}
+def import_phone_dir(phone_dir, file_name):
+    MAIN_DIR = abspath(dirname(__file__))
+    full_name = join(MAIN_DIR, f"{file_name}.txt")
+    if not exists(full_name):
+        print("Error! File not found.")
+        return
+    idc = 0
+    phone_dir = dict()
+    with open(full_name, mode='r', encoding='utf-8') as file:
+        for line in file:
+            lst = line.strip().split('#')[1:]
+            phone_dir, idc = create(phone_dir, idc, lst)
+            # print(lst)
+    return phone_dir, idc
 
-print_dict(phone_dir)
+def delete_user(phone_dir_local: dict, del_index: int)-> bool:
+    result = phone_dir_local.pop(del_index, [0])
+    if result == 0: 
+        print("Not found")
+        return False
+    print(f"{result} удалено")
+    return True
+
+def update_user(phone_dir_local: dict, upd_index: int):
+    user = input_data()
+    phone_dir_local[upd_index] = user
+    print (f'{phone_dir_local[upd_index]} is update')
+
+
+def menu ():
+    print("A-добавить. P-печать. E-экспорт. I-импорт. F-поиск. D-удалить. U-изменить. Q-выход")
+    key_count =0
+    phone_dir = dict()
+    while True:
+        user_command = input("Выберите операцию: ").upper()
+        if user_command == 'Q':
+            break
+        elif user_command == "A":
+           data = input_data()
+           phone_dir, key_count = create(phone_dir, key_count, data)
+        elif user_command == 'P':
+            print_dict(phone_dir)
+        elif user_command == "E":
+            file_name = input("Введите имя файла: ")
+            export_phone_dir(phone_dir, file_name)
+        elif user_command == "I":
+            file_name = input("Введите имя файла: ")
+            phone_dir, key_count = import_phone_dir(phone_dir, file_name)
+            print(f"Импортировано {key_count} записей")
+        elif user_command == 'F':
+            searching = input("Кого ищем? ")
+            idc = search_user(phone_dir, searching)
+            if idc == None: print("Not found")
+            else: print_once(phone_dir, idc)
+        elif user_command == 'D':
+            id_delete = int(input("Номер удаляемой записи(0-отмена): "))
+            if id_delete != 0:
+                delete_user(phone_dir, id_delete)
+        elif user_command == 'U':
+            data = input("Номер записи или фамилия: ")
+            idc = 0
+            if data.isdigit():
+                idc = int(data)
+            else:
+                idc = search_user(phone_dir, data)
+                if idc == 0:
+                    key_count += 1
+                    idc = key_count
+            update_user(phone_dir, idc)
+            
+
+
+key_count =0
+phone_dir = dict()
+
+# user1 = ["Абырвалгов","Гиви","+7(328)123-56-56","discription1"]
+# user2 = ["second_name2","first_name2","phone2","discription2"]
+
+# phone_dir, key_count=create(phone_dir,key_count,user1)
+# phone_dir, key_count=create(phone_dir,key_count,user2)
+
+
+# phone_dir = {1: ['Иванов',   'Иван',  '+7(xxx)xxx-xx-xx', 'desription_Иванов'], 
+#             2: ['Петров',   'Петр',  '+7(---)xxx-xx-xx', 'desription_Петров'], 
+#             3: ['Соколов',  'Илья',  '+7(---)---------', 'desription_Соколов'], 
+#             4: ['Павельев', 'Андрей','+7(***)***-**-**', 'desription_Павельев'], 
+#             5: ['Пешехов',  'Антон', '+7++++++++++',     'desription_Пешехов'], 
+#             6: ['Сааков',   'Илья',  '+7(+++)+++-++-++', 'desription_Сааков'], 
+#             }
+
+
+menu ()
+# print_dict(phone_dir)
 # print(phone_dir)
-# menu ()
 # export_phone_dir(phone_dir, "phones")
 # print(search_user(phone_dir, "Пеш"))
+# phone_dir, key_count = import_phone_dir(phone_dir, 'phones')
+# phone_dir, key_count = create(phone_dir, key_count, user1)
+# print_dict(phone_dir)
+# export_phone_dir(phone_dir, "phones")
